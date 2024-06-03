@@ -6,7 +6,6 @@ body
 #board
 {
     background-color: black;
-    /* y-margin */
     border-top: 5px solid turquoise;
     border-bottom: 5px solid turquoise;
 }
