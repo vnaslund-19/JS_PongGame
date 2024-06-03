@@ -29,7 +29,8 @@ let Lplayer =
     y : boardSide/2 - playerHeight/2,
     width : playerWidth,
     height : playerHeight,
-    speed : 0
+    speed : 0,
+    score: 0
 }
 
 // Right player
@@ -39,7 +40,8 @@ let Rplayer =
     y : boardSide/2 - playerHeight/2,
     width : playerWidth,
     height : playerHeight,
-    speed : 0
+    speed : 0,
+    score : 0
 }
 
 window.onload = function()
@@ -84,8 +86,29 @@ function update()
     // Bounce of top & bottom
     if (ball.y <= 0 || (ball.y + ball.height >= board.height))
         ball.ySpeed *= -1;
+
     handlePaddleHit(ball, Lplayer);
     handlePaddleHit(ball, Rplayer);
+
+    // Point scored
+    if (ball.x < 0)
+    {
+        Rplayer.score++;
+        resetGame(1);
+    }
+
+    if (ball.x + ball.width > board.width)
+    {
+        Lplayer.score++;
+        resetGame(-1);
+    }
+
+    context.font = "45px sans-serif";
+    context.fillText(Lplayer.score, board.width/5, 45);
+    context.fillText(Rplayer.score, board.width/5 * 4 -45, 45);
+
+    for (let i = 10; i < board.height; i+=25)
+        context.fillRect(board.width/2 - 10, i, 5, 5);
 }
 
 function fixOutOfBounds(player, yMax)
@@ -133,5 +156,18 @@ function handlePaddleHit(ball, player)
             ball.x = player.x - ball.width;
         else if (ball.x + ball.width > player.x + player.width)
             ball.x = player.x + player.width;
+    }
+}
+
+function resetGame(direction)
+{
+    ball = 
+    {
+        x : boardSide / 2 - ballSide / 2,
+        y : boardSide / 2 - ballSide / 2,
+        width : ballSide,
+        height : ballSide,
+        xSpeed : direction,
+        ySpeed: 2
     }
 }
