@@ -8,13 +8,13 @@ let boardHeight = 500;
 let xMargin = 10;
 
 let ballSide = 10;
-// Velocity
-let xStartVel = 3.5;
-let yStartVel = 4.5;
 
-// Pythagoras theorem
-startSpeed = Math.sqrt(Math.pow(xStartVel, 2) + Math.pow(yStartVel, 2));
-console.log(startSpeed);
+let startSpeed = 6;
+let startRadAngle = getRandomBetween((-Math.PI/4), (Math.PI/4));
+
+let xStartVel = startSpeed * Math.cos(startRadAngle) * getRandomEitherOr(-1, 1);
+let yStartVel = startSpeed * Math.sin(startRadAngle);
+
 
 let ball = 
 {
@@ -100,26 +100,25 @@ function update()
     ball.y += ball.yVel;
     context.fillRect(ball.x, ball.y, ball.width, ball.height);
 
-    // Bounce of top & bottom
-    if (ball.y <= 0 || (ball.y + ball.height >= board.height))
-        ball.yVel *= -1;
-
     handlePaddleHit(ball, Lplayer);
     if (handlePaddleHit(ball, Rplayer))
         ball.xVel *= -1;
         
+    // Bounce of top & bottom
+    if (ball.y <= 0 || (ball.y + ball.height >= board.height))
+        ball.yVel *= -1;
 
-    // Point scored
+    // Point scored, player who conceded serves
     if (ball.x < 0)
     {
         Rplayer.score++;
-        resetGame(xStartVel);
+        resetGame(-1);
     }
 
     if (ball.x + ball.width > board.width)
     {
         Lplayer.score++;
-        resetGame(-xStartVel);
+        resetGame(1);
     }
 
     context.font = "45px sans-serif";
@@ -210,7 +209,6 @@ function handlePaddleHit(ball, player)
         (ball.y < player.y + player.height) && // The ball's top left corner doesn't reach the paddles bottom left corner
         (ball.y + ball.height > player.y))     // The ball's bottom left corner passes the paddles top left corner
     {
-
         // Push to closest edge of paddle when it hits the bottom of the paddle
         if (ball.x < player.x)
             ball.x = player.x - ball.width;
@@ -244,14 +242,31 @@ function handlePaddleHit(ball, player)
 
 function resetGame(direction)
 {
+    startRadAngle = getRandomBetween((-Math.PI/4), (Math.PI/4));
+    xStartVel = startSpeed * Math.cos(startRadAngle) * direction;
+    yStartVel = startSpeed * Math.sin(startRadAngle);
+
     ball = 
     {
         x : boardWidth / 2 - ballSide / 2,
         y : boardHeight / 2 - ballSide / 2,
         width : ballSide,
         height : ballSide,
-        xVel : direction,
+        xVel : xStartVel,
         yVel: yStartVel,
         speed: startSpeed
     }
+}
+
+function getRandomBetween(min, max) 
+{
+    return (Math.random() * (max - min) + min);
+}
+
+function getRandomEitherOr(value1, value2)
+{
+    if (Math.random() > 0.5)
+        return (value1);
+    else
+        return (value2);
 }
