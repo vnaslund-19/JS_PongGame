@@ -3,19 +3,28 @@
 let board;
 let context;
 
-let boardSide = 500;
+let boardWidth = 700;
+let boardHeight = 500;
 let xMargin = 10;
 
 let ballSide = 10;
+// Velocity
+let xStartVel = 3.5;
+let yStartVel = 4.5;
+
+// Pythagoras theorem
+startSpeed = Math.sqrt(Math.pow(xStartVel, 2) + Math.pow(yStartVel, 2));
+console.log(startSpeed);
 
 let ball = 
 {
-    x : boardSide / 2 - ballSide / 2,
-    y : boardSide / 2 - ballSide / 2,
+    x : boardWidth / 2 - ballSide / 2,
+    y : boardHeight / 2 - ballSide / 2,
     width : ballSide,
     height : ballSide,
-    xSpeed : 1.5,
-    ySpeed: 3
+    xVel : xStartVel,
+    yVel: yStartVel,
+    speed : startSpeed
 }
 
 let keyState = 
@@ -34,7 +43,7 @@ let playerSpeed = 5;
 let Lplayer =
 {
     x : xMargin,
-    y : boardSide/2 - playerHeight/2,
+    y : boardHeight/2 - playerHeight/2,
     width : playerWidth,
     height : playerHeight,
     speed : 0,
@@ -44,8 +53,8 @@ let Lplayer =
 // Right player
 let Rplayer =
 {
-    x : boardSide - playerWidth - xMargin,
-    y : boardSide/2 - playerHeight/2,
+    x : boardWidth - playerWidth - xMargin,
+    y : boardHeight/2 - playerHeight/2,
     width : playerWidth,
     height : playerHeight,
     speed : 0,
@@ -55,8 +64,8 @@ let Rplayer =
 window.onload = function()
 {
     board = document.getElementById("board");
-    board.height = boardSide;
-    board.width = boardSide;
+    board.width = boardWidth;
+    board.height = boardHeight;
     context = board.getContext("2d");
 
     // draw players
@@ -87,28 +96,30 @@ function update()
 
     // ball
     context.fillStyle = "white";
-    ball.x += ball.xSpeed;
-    ball.y += ball.ySpeed;
+    ball.x += ball.xVel;
+    ball.y += ball.yVel;
     context.fillRect(ball.x, ball.y, ball.width, ball.height);
 
     // Bounce of top & bottom
     if (ball.y <= 0 || (ball.y + ball.height >= board.height))
-        ball.ySpeed *= -1;
+        ball.yVel *= -1;
 
     handlePaddleHit(ball, Lplayer);
-    handlePaddleHit(ball, Rplayer);
+    if (handlePaddleHit(ball, Rplayer))
+        ball.xVel *= -1;
+        
 
     // Point scored
     if (ball.x < 0)
     {
         Rplayer.score++;
-        resetGame(1.5);
+        resetGame(xStartVel);
     }
 
     if (ball.x + ball.width > board.width)
     {
         Lplayer.score++;
-        resetGame(-1.5);
+        resetGame(-xStartVel);
     }
 
     context.font = "45px sans-serif";
@@ -199,25 +210,48 @@ function handlePaddleHit(ball, player)
         (ball.y < player.y + player.height) && // The ball's top left corner doesn't reach the paddles bottom left corner
         (ball.y + ball.height > player.y))     // The ball's bottom left corner passes the paddles top left corner
     {
-        ball.xSpeed *= -1.1;
 
-        // Push to closest edge of paddle
-        if (ball.x < player.x) 
+        // Push to closest edge of paddle when it hits the bottom of the paddle
+        if (ball.x < player.x)
             ball.x = player.x - ball.width;
         else if (ball.x + ball.width > player.x + player.width)
             ball.x = player.x + player.width;
+
+        // Position of the middle of the ball in relation to the middle of the paddle (-playerHeight/2 - ballSide/2 & playerHeight/2 + ballside/2)
+        let collisionPoint = ball.y - player.y - playerHeight/2 + ballSide/2;
+        if (collisionPoint > playerHeight/2)
+            collisionPoint = playerHeight/2;
+        else if (collisionPoint < -playerHeight/2)
+            collisionPoint = -playerHeight/2;
+
+        // Convert to index between -1 & 1
+        collisionPoint /= playerHeight/2;
+
+        // Rebound angle, depends on where it hits the paddle
+        // Max 45 deg, min -45 deg if it hits the edges
+        let radAngle = (Math.PI/4) * collisionPoint;
+
+        // Speed increases with every hit
+        ball.speed *= 1.035;
+
+        // x & y component calc, x speed is flipped for the ball to bounce
+        ball.xVel = ball.speed * Math.cos(radAngle);
+        ball.yVel = ball.speed * Math.sin(radAngle);
+        return true;
     }
+    return false;
 }
 
 function resetGame(direction)
 {
     ball = 
     {
-        x : boardSide / 2 - ballSide / 2,
-        y : boardSide / 2 - ballSide / 2,
+        x : boardWidth / 2 - ballSide / 2,
+        y : boardHeight / 2 - ballSide / 2,
         width : ballSide,
         height : ballSide,
-        xSpeed : direction,
-        ySpeed: 3
+        xVel : direction,
+        yVel: yStartVel,
+        speed: startSpeed
     }
 }
