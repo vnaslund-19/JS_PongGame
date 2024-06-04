@@ -3,13 +3,15 @@
 let board;
 let context;
 
-let boardWidth = 700;
-let boardHeight = 500;
-let xMargin = 10;
+const boardWidth = 700;
+const boardHeight = 500;
+const xMargin = 10; // Margin from paddle to side of board
 
-let ballSide = 10;
+const ballSide = 10;
 
-let startSpeed = 6;
+const startSpeed = 6;
+const speedUpMultiple = 1.035;
+
 let startRadAngle = getRandomBetween((-Math.PI/4), (Math.PI/4));
 
 let xStartVel = startSpeed * Math.cos(startRadAngle) * getRandomEitherOr(-1, 1);
@@ -35,9 +37,9 @@ let keyState =
     down: false // ArrowDown
 };
 
-let playerHeight = 50;
-let playerWidth = 10;
-let playerSpeed = 5;
+const playerHeight = 50;
+const playerWidth = 10;
+const playerSpeed = 5;
 
 // Left player
 let Lplayer =
@@ -230,7 +232,7 @@ function handlePaddleHit(ball, player)
         let radAngle = (Math.PI/4) * collisionPoint;
 
         // Speed increases with every hit
-        ball.speed *= 1.035;
+        ball.speed *= speedUpMultiple;
 
         // x & y component calc, x speed is flipped for the ball to bounce
         ball.xVel = ball.speed * Math.cos(radAngle);
