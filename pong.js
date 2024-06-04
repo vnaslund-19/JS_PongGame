@@ -25,8 +25,9 @@ let ball =
     width : ballSide,
     height : ballSide,
     xVel : xStartVel,
-    yVel: yStartVel,
-    speed : startSpeed
+    yVel : yStartVel,
+    speed : startSpeed,
+    serve : true
 }
 
 let keyState = 
@@ -98,8 +99,16 @@ function update()
 
     // ball
     context.fillStyle = "white";
-    ball.x += ball.xVel;
-    ball.y += ball.yVel;
+    if (ball.serve)
+    {
+        ball.x += ball.xVel/2;
+        ball.y += ball.yVel/2;
+    }
+    else
+    {
+        ball.x += ball.xVel;
+        ball.y += ball.yVel;
+    }
     context.fillRect(ball.x, ball.y, ball.width, ball.height);
 
     handlePaddleHit(ball, Lplayer);
@@ -237,6 +246,7 @@ function handlePaddleHit(ball, player)
         // x & y component calc, x speed is flipped for the ball to bounce
         ball.xVel = ball.speed * Math.cos(radAngle);
         ball.yVel = ball.speed * Math.sin(radAngle);
+        ball.serve = false;
         return true;
     }
     return false;
@@ -255,8 +265,9 @@ function resetGame(direction)
         width : ballSide,
         height : ballSide,
         xVel : xStartVel,
-        yVel: yStartVel,
-        speed: startSpeed
+        yVel : yStartVel,
+        speed : startSpeed,
+        serve : true
     }
 }
 
