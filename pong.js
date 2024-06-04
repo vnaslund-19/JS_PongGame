@@ -14,9 +14,17 @@ let ball =
     y : boardSide / 2 - ballSide / 2,
     width : ballSide,
     height : ballSide,
-    xSpeed : 1,
-    ySpeed: 2
+    xSpeed : 1.5,
+    ySpeed: 3
 }
+
+let keyState = 
+{
+    w: false,
+    s: false,
+    up: false,  // ArrowUp
+    down: false // ArrowDown
+};
 
 let playerHeight = 50;
 let playerWidth = 10;
@@ -94,19 +102,20 @@ function update()
     if (ball.x < 0)
     {
         Rplayer.score++;
-        resetGame(1);
+        resetGame(1.5);
     }
 
     if (ball.x + ball.width > board.width)
     {
         Lplayer.score++;
-        resetGame(-1);
+        resetGame(-1.5);
     }
 
     context.font = "45px sans-serif";
     context.fillText(Lplayer.score, board.width/5, 45);
     context.fillText(Rplayer.score, board.width/5 * 4 -45, 45);
 
+    // Draw middle line
     for (let i = 10; i < board.height; i+=25)
         context.fillRect(board.width/2 - 10, i, 5, 5);
 }
@@ -122,24 +131,65 @@ function fixOutOfBounds(player, yMax)
 function keyDownHandler(event)
 {
     if (event.code == "KeyW")
+    {
         Lplayer.speed = -playerSpeed;
+        keyState.w = true;
+    }
     else if (event.code == "KeyS")
+    {
         Lplayer.speed = playerSpeed;
-
+        keyState.s = true;
+    }
     if (event.code == "ArrowUp")
+    {
         Rplayer.speed = -playerSpeed;
+        keyState.up = true;
+    }
     else if (event.code == "ArrowDown")
+    {
         Rplayer.speed = playerSpeed;
+        keyState.down = true;
+    }
 }
 
-// Player stops when button is released/no longer pressed down
+// Player stops when button is released/no longer pressed down FIX DOUBLE HOLD DOWN RELEASE
 function keyUpHandler(event)
 {
-    if (event.code == "KeyW" || event.code == "KeyS")
-        Lplayer.speed = 0;
+    if (event.code == "KeyW")
+    {
+        keyState.w = false;
+        if (keyState.s == true)
+            Lplayer.speed = playerSpeed;
+        else
+            Lplayer.speed = 0;
+    }
 
-    if (event.code == "ArrowUp" || event.code == "ArrowDown")
-        Rplayer.speed = 0;
+    if (event.code == "KeyS")
+    {
+        keyState.s = false;
+        if (keyState.w == true)
+            Lplayer.speed = -playerSpeed;
+        else
+            Lplayer.speed = 0;
+    }
+
+    if (event.code == "ArrowUp")
+    {
+        keyState.up = false;
+        if (keyState.down == true)
+            Rplayer.speed = playerSpeed;
+        else
+            Rplayer.speed = 0;
+    }
+
+    if (event.code == "ArrowDown")
+    {
+        keyState.down = false;
+        if (keyState.up == true)
+            Rplayer.speed = -playerSpeed;
+        else
+            Rplayer.speed = 0;
+    }
 }
 
 function handlePaddleHit(ball, player)
@@ -168,6 +218,6 @@ function resetGame(direction)
         width : ballSide,
         height : ballSide,
         xSpeed : direction,
-        ySpeed: 2
+        ySpeed: 3
     }
 }
