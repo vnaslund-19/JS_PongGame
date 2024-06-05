@@ -9,8 +9,8 @@ const xMargin = 10; // Margin from paddle to side of board
 
 const ballSide = 10;
 
-const startSpeed = 6;
-const speedUpMultiple = 1.035;
+const startSpeed = 7;
+const speedUpMultiple = 1.02;
 
 let startRadAngle = getRandomBetween((-Math.PI/4), (Math.PI/4));
 
