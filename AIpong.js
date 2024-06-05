@@ -64,6 +64,8 @@ let Rplayer =
     score : 0
 }
 
+let predictedY;
+
 window.onload = function()
 {
     board = document.getElementById("board");
@@ -79,6 +81,9 @@ window.onload = function()
     requestAnimationFrame(update);
     document.addEventListener("keydown", keyDownHandler);
     document.addEventListener("keyup", keyUpHandler);
+
+    setInterval(function() 
+    { predictedY = predictFinalYPos(ball);}, 1000);
 }
 
 function update()
@@ -114,10 +119,12 @@ function update()
     handlePaddleHit(ball, Lplayer);
     if (handlePaddleHit(ball, Rplayer))
         ball.xVel *= -1;
-        
+
     // Bounce of top & bottom
     if (ball.y <= 0 || (ball.y + ball.height >= board.height))
         ball.yVel *= -1;
+
+    simulateAIInput();
 
     // Point scored, player who conceded serves
     if (ball.x < 0)
@@ -198,6 +205,61 @@ function resetGame(direction)
         yVel : yStartVel,
         speed : startSpeed,
         serve : true
+    }
+}
+
+function predictFinalYPos(ball)
+{
+    if (ball.xVel < 0) // If ball is going away from AI
+        return (boardHeight / 2 - ballSide / 2) // Prompt AI to go back to middle
+
+    // Amount of times the screen refreshes before ball reaches other side: Length / xVel
+    let refreshes = (boardWidth - xMargin - playerWidth - ball.x) / ball.xVel;
+    let yMovement = (ball.yVel * refreshes) % (boardHeight*2);
+    
+    let distanceToBottom = boardHeight - ball.y;
+    let distanceToTop = ball.y;
+    let finalYPos = ball.y;
+
+    for (let i = 0; i < 2; i++) 
+    {
+        // Bounce off top
+        if (yMovement < 0 && yMovement < -distanceToTop)
+        {
+            yMovement += distanceToTop;
+            yMovement *= -1; 
+            finalYPos = 0;
+        }
+        // Bounce off bottom
+        else if (yMovement > 0 && yMovement > distanceToBottom)
+        {
+            yMovement -= distanceToBottom;
+            yMovement *= -1;
+            finalYPos = boardHeight;
+        }
+    }
+    finalYPos += yMovement;
+    return (finalYPos);
+}
+
+function simulateAIInput() 
+{
+    let AImargin = playerHeight/5;
+
+    if (predictedY < Rplayer.y + playerHeight - AImargin && predictedY > Rplayer.y + AImargin)
+    {
+        keyUpHandler({ code: "ArrowUp" });
+        keyUpHandler({ code: "ArrowDown" });
+    }
+    else if (predictedY < Rplayer.y + playerHeight/2)
+    {
+        keyDownHandler({ code: "ArrowUp" });
+        keyUpHandler({ code: "ArrowDown" });
+    } 
+    else if (predictedY > Rplayer.y + playerHeight/2) 
+    {
+        keyDownHandler({ code: "ArrowDown" });
+        keyUpHandler({ code: "ArrowUp" });
     }
 }
 
