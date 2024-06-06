@@ -29,7 +29,7 @@ let ball =
     yVel : yStartVel,
     speed : startSpeed,
     serve : true
-}
+};
 
 let keyState = 
 {
@@ -52,7 +52,7 @@ let Lplayer =
     height : playerHeight,
     speed : 0,
     score: 0
-}
+};
 
 // Right player (AI)
 let Rplayer =
@@ -63,9 +63,11 @@ let Rplayer =
     height : playerHeight,
     speed : 0,
     score : 0
-}
+};
 
 let predictedY;
+let AImargin;
+let gameEnded = false;
 
 window.onload = function()
 {
@@ -89,6 +91,9 @@ window.onload = function()
 
 function update()
 {
+    if (gameEnded)
+        return;
+
     requestAnimationFrame(update);
     context.clearRect(0, 0, board.width, board.height);
     context.fillStyle = "turquoise";
@@ -129,16 +134,26 @@ function update()
 
     // Point scored, player who conceded serves
     if (ball.x < 0)
-    {
-        Rplayer.score++;
-        resetGame(-1);
-    }
-
-    if (ball.x + ball.width > board.width)
-    {
-        Lplayer.score++;
-        resetGame(1);
-    }
+        {
+            Rplayer.score++;
+            if (Rplayer.score >= 5) 
+            {
+                endGame('AI wins!');
+                return;
+            }
+            resetGame(-1);
+        }
+    
+        if (ball.x + ball.width > board.width)
+        {
+            Lplayer.score++;
+            if (Lplayer.score >= 5)
+            {
+                endGame('You win!');
+                return;
+            }
+            resetGame(1);
+        }
 
     context.font = "45px sans-serif";
     context.fillText(Lplayer.score, board.width/5, 45);
@@ -209,10 +224,24 @@ function resetGame(direction)
     }
 }
 
+function endGame(winner)
+{
+    gameEnded = true;
+    context.clearRect(0, 0, board.width, board.height);
+    context.fillStyle = "black";
+    context.fillRect(0, 0, board.width, board.height);
+    context.fillStyle = "white";
+    context.font = "50px sans-serif";
+    context.fillText(winner, board.width / 2 - (winner.length/2 * 25), board.height / 2);
+
+    // Wait for 3 seconds before redirecting to index.html
+    setTimeout(() => {window.location.href = 'index.html'; }, 3000);
+}
+
 function predictFinalYPos(ball)
 {
     if (ball.xVel < 0) // If ball is going away from AI
-        return (boardHeight / 2 - ballSide / 2) // Prompt AI to go back to middle
+        return (boardHeight / 2 - ballSide / 2); // Prompt AI to go back to middle
 
     // Amount of times the screen refreshes before ball reaches other side: Length / xVel
     let refreshes = (boardWidth - xMargin - playerWidth - ball.x) / ball.xVel;
@@ -240,13 +269,19 @@ function predictFinalYPos(ball)
         }
     }
     finalYPos += yMovement;
+
+    // Is then used in simulateAIinput
+    // Randomness (AImargin) makes it hit at different angles
+    // If you want it to sometimes miss, change the min value to negative
+    // For it to regularly miss, the multiple has to be 0.3 or below
+    // For -0.1 it only misses for very straight shots
+    AImargin = playerHeight * getRandomBetween(-0.1, 0.45);
+
     return (finalYPos);
 }
 
 function simulateAIInput() 
 {
-    let AImargin = playerHeight/5;
-
     if (predictedY < Rplayer.y + playerHeight - AImargin && predictedY > Rplayer.y + AImargin)
     {
         keyUpHandler({ code: "ArrowUp" });

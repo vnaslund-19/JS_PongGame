@@ -9,7 +9,6 @@ body {
     border-bottom: 5px solid turquoise;
 }
 
-/* Index page specific styles */
 .index-body {
     display: flex;
     flex-direction: column;
@@ -27,7 +26,7 @@ body {
 
 .button-container {
     display: flex;
-    gap: 50px; /* Increase the gap to separate the columns more */
+    gap: 50px;
 }
 
 .button-column {
@@ -74,12 +73,12 @@ button:hover {
     position: absolute;
     left: 10px;
     font-size: 20px;
-    color: black;
+    color: grey;
 }
 
 .right-instructions {
     position: absolute;
     right: 10px;
     font-size: 20px;
-    color: black;
+    color: grey;
 }

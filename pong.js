@@ -52,7 +52,7 @@ let Lplayer =
     height : playerHeight,
     speed : 0,
     score: 0
-}
+};
 
 // Right player
 let Rplayer =
@@ -63,7 +63,9 @@ let Rplayer =
     height : playerHeight,
     speed : 0,
     score : 0
-}
+};
+
+let gameEnded = false;
 
 window.onload = function()
 {
@@ -80,10 +82,13 @@ window.onload = function()
     requestAnimationFrame(update);
     document.addEventListener("keydown", keyDownHandler);
     document.addEventListener("keyup", keyUpHandler);
-}
+};
 
 function update()
 {
+    if (gameEnded)
+        return;
+
     requestAnimationFrame(update);
     context.clearRect(0, 0, board.width, board.height);
     context.fillStyle = "turquoise";
@@ -124,12 +129,22 @@ function update()
     if (ball.x < 0)
     {
         Rplayer.score++;
+        if (Rplayer.score >= 5) 
+        {
+            endGame('Right wins!');
+            return;
+        }
         resetGame(-1);
     }
 
     if (ball.x + ball.width > board.width)
     {
         Lplayer.score++;
+        if (Lplayer.score >= 5) 
+        {
+            endGame('Left wins!');
+            return;
+        }
         resetGame(1);
     }
 
@@ -174,7 +189,7 @@ function handlePaddleHit(ball, player)
         // Speed increases with every hit
         ball.speed *= speedUpMultiple;
 
-        // x & y component calc, x speed is flipped for the ball to bounce
+        // x & y component calc, xVel is later flipped for the ball to bounce
         ball.xVel = ball.speed * Math.cos(radAngle);
         ball.yVel = ball.speed * Math.sin(radAngle);
         ball.serve = false;
@@ -200,6 +215,20 @@ function resetGame(direction)
         speed : startSpeed,
         serve : true
     }
+}
+
+function endGame(winner)
+{
+    gameEnded = true;
+    context.clearRect(0, 0, board.width, board.height);
+    context.fillStyle = "black";
+    context.fillRect(0, 0, board.width, board.height);
+    context.fillStyle = "white";
+    context.font = "50px sans-serif";
+    context.fillText(winner, board.width / 2 - (winner.length/2 * 25), board.height / 2);
+
+    // Wait for 3 seconds before redirecting to index.html
+    setTimeout(() => {window.location.href = 'index.html'; }, 3000);
 }
 
 function keyDownHandler(event)
