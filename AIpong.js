@@ -240,6 +240,15 @@ function endGame(winner)
 
 function predictFinalYPos(ball)
 {
+    // AImargin is used in simulateAIinput
+    // The calculation is put into this function 
+    // to avoid constant recalculation of a random value and thus the AI jittering
+    // Randomness (AImargin) makes the AI hit at different angles
+    // If you want it to sometimes miss, change the min value to negative
+    // For it to regularly miss, the multiple has to be 0.3 or below
+    // If getRandom returns -0.1 it only misses for very straight shots
+    AImargin = playerHeight * getRandomBetween(-0.1, 0.45);
+
     if (ball.xVel < 0) // If ball is going away from AI
         return (boardHeight / 2 - ballSide / 2); // Prompt AI to go back to middle
 
@@ -269,14 +278,6 @@ function predictFinalYPos(ball)
         }
     }
     finalYPos += yMovement;
-
-    // Is then used in simulateAIinput
-    // Randomness (AImargin) makes it hit at different angles
-    // If you want it to sometimes miss, change the min value to negative
-    // For it to regularly miss, the multiple has to be 0.3 or below
-    // For -0.1 it only misses for very straight shots
-    AImargin = playerHeight * getRandomBetween(-0.1, 0.45);
-
     return (finalYPos);
 }
 
