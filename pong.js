@@ -9,8 +9,9 @@ const xMargin = 10; // Margin from paddle to side of board
 
 const ballSide = 10;
 
-const startSpeed = 7;
+const startSpeed = 7.5;
 const speedUpMultiple = 1.02;
+const serveSpeedMultiple = 0.4;
 
 let startRadAngle = getRandomBetween((-Math.PI/4), (Math.PI/4));
 
@@ -101,8 +102,8 @@ function update()
     context.fillStyle = "white";
     if (ball.serve)
     {
-        ball.x += ball.xVel/2;
-        ball.y += ball.yVel/2;
+        ball.x += ball.xVel * serveSpeedMultiple;
+        ball.y += ball.yVel * serveSpeedMultiple;
     }
     else
     {

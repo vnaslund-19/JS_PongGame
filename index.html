@@ -9,8 +9,21 @@
 <body class="index-body">
     <h1>Welcome to JS Pong Game</h1>
     <div class="button-container">
-        <button onclick="window.location.href='AI.html'">Play against AI</button>
-        <button onclick="window.location.href='1v1.html'">Play 1v1</button>
+        <div class="button-column">
+            <h3>Play locally</h3>
+            <div class="localPlay-buttons">
+                <button onclick="window.location.href='1v1.html'">Play 1v1</button>
+            </div>
+        </div>
+        <div class="button-column">
+            <h3>Play against AI</h3>
+            <div class="aiPlay-buttons">
+                <button onclick="window.location.href='AIgame.html?difficulty=easy'">Easy</button>
+                <button onclick="window.location.href='AIgame.html?difficulty=medium'">Medium</button>
+                <button onclick="window.location.href='AIgame.html?difficulty=hard'">Hard</button>
+                <button onclick="window.location.href='AIgame.html?difficulty=impossible'">Impossible</button>
+            </div>
+        </div>
     </div>
 </body>
 </html>

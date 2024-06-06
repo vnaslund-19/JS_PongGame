@@ -27,10 +27,23 @@ body {
 
 .button-container {
     display: flex;
-    gap: 20px;
+    gap: 50px; /* Increase the gap to separate the columns more */
 }
 
-.button-container button {
+.button-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.localPlay-buttons, .aiPlay-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+button {
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
@@ -40,6 +53,33 @@ body {
     transition: background-color 0.3s;
 }
 
-.button-container button:hover {
+button:hover {
     background-color: #1E90FF;
+}
+
+.button-column h3 {
+    color: lightgray;
+    margin-bottom: 10px;
+}
+
+.instructions {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 28px;
+    color: black;
+}
+
+.left-instructions {
+    position: absolute;
+    left: 10px;
+    font-size: 20px;
+    color: black;
+}
+
+.right-instructions {
+    position: absolute;
+    right: 10px;
+    font-size: 20px;
+    color: black;
 }
