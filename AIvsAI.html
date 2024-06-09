@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Pong Game</title>
+    <link rel="stylesheet" href="pong.css">
+</head>
+<body>
+    <h1 id="game-title">JS Pong game vs AI</h1>
+    <canvas id="board"></canvas>
+    <script>
+        // Get query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const difficulty = urlParams.get('difficulty');
+
+        // Set msAIcalcRefresh based on difficulty
+        let msAIcalcRefresh;
+        let difficultyText;
+
+        if (difficulty === 'easy') 
+        {
+            msAIcalcRefresh = 1200;
+            difficultyText = "Easy AI";
+        } 
+        else if (difficulty === 'medium') 
+        {
+            msAIcalcRefresh = 1000;
+            difficultyText = "Medium AI";
+        } 
+        else if (difficulty === 'hard')
+        {
+            msAIcalcRefresh = 700;
+            difficultyText = "Hard AI";
+        } 
+        else if (difficulty === 'impossible') 
+        {
+            msAIcalcRefresh = 100;
+            difficultyText = "Impossible AI";
+        } 
+        else 
+        {
+            msAIcalcRefresh = 1000; // Default to medium if parameter error occurs
+            difficultyText = "medium AI";
+        }
+
+        // Change title and heading based on difficulty
+        document.title = `JS Pong game`;
+        document.getElementById('game-title').textContent = `${difficultyText} vs ${difficultyText}`;
+
+        // Include the common game logic script
+        const script = document.createElement('script');
+        script.src = 'AIvsAI.js';
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>

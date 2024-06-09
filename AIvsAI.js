@@ -237,8 +237,8 @@ function endGame(winner)
     context.font = "50px sans-serif";
     context.fillText(winner, board.width / 2 - (winner.length / 2 * 25), board.height / 2);
 
-    // Wait for 3 seconds before redirecting to index.html
-    setTimeout(() => { window.location.href = 'index.html'; }, 3000);
+    // Wait for 3 seconds before redirecting to pong.html
+    setTimeout(() => { window.location.href = 'pong.html'; }, 3000);
 }
 
 function predictFinalYPos(ball, player)
