@@ -1,6 +1,5 @@
 let predictedY;
 let AImargin;
-let powerUpPos;
 
 window.onload = function()
 {
@@ -117,10 +116,7 @@ function predictFinalYPos(ball)
     // ball.yVel > 3 as its only logical to use the powerUp when the ball is moving at a steep angle 
     // ball.x checks are that so the power up is only used on opponents side but not too close to opponent
     if (!keyState.rPowerUpUsed && ball.xVel < 0 && !ball.serve && ball.x < boardWidth/2 && ball.x > boardWidth/7 && ball.yVel > 3)
-    {
         keyDownHandler({ code : "ArrowLeft" });
-        keyUpHandler({ code: "ArrowLeft" });
-    }
 
     if (ball.xVel < 0) // If ball is going away from AI
         return (boardHeight / 2 - ballSide / 2); // Prompt AI to go back to middle
@@ -151,8 +147,6 @@ function predictFinalYPos(ball)
         }
     }
     finalYPos += yMovement;
-    powerUpPos = getRandomBetween(boardWidth/6, boardWidth/2); // Randomly update what xPos the AI uses the powerUp in
-    console.log(ball.yVel);
     return (finalYPos);
 }
 

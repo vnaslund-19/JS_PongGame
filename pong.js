@@ -159,7 +159,7 @@ function keyDownHandler(event)
         Lplayer.speed = playerSpeed;
         keyState.s = true;
     }
-    if (event.code == "ArrowUp")
+    else if (event.code == "ArrowUp")
     {
         Rplayer.speed = -playerSpeed;
         keyState.up = true;
@@ -168,6 +168,23 @@ function keyDownHandler(event)
     {
         Rplayer.speed = playerSpeed;
         keyState.down = true;
+    }
+    else if (event.code == "KeyD")
+        {
+            if (ball.xVel > 0 && !keyState.lPowerUpUsed)
+            {
+                keyState.lPowerUpUsed = true;
+                freezeAndChangeDir();
+            }
+        }
+        
+    else if (event.code == "ArrowLeft")
+    {
+        if (ball.xVel < 0 && !keyState.rPowerUpUsed)
+        {
+            keyState.rPowerUpUsed = true;
+            freezeAndChangeDir();
+        }
     }
 }
 
@@ -182,8 +199,7 @@ function keyUpHandler(event)
         else
             Lplayer.speed = 0;
     }
-
-    if (event.code == "KeyS")
+    else if (event.code == "KeyS")
     {
         keyState.s = false;
         if (keyState.w == true)
@@ -191,8 +207,7 @@ function keyUpHandler(event)
         else
             Lplayer.speed = 0;
     }
-
-    if (event.code == "ArrowUp")
+    else if (event.code == "ArrowUp")
     {
         keyState.up = false;
         if (keyState.down == true)
@@ -200,32 +215,13 @@ function keyUpHandler(event)
         else
             Rplayer.speed = 0;
     }
-
-    if (event.code == "ArrowDown")
+    else if (event.code == "ArrowDown")
     {
         keyState.down = false;
         if (keyState.up == true)
             Rplayer.speed = -playerSpeed;
         else
             Rplayer.speed = 0;
-    }
-
-    if (event.code == "KeyD")
-        {
-            if (ball.xVel > 0 && !keyState.lPowerUpUsed)
-            {
-                keyState.lPowerUpUsed = true;
-                freezeAndChangeDir();
-            }
-        }
-        
-    if (event.code == "ArrowLeft")
-    {
-        if (ball.xVel < 0 && !keyState.rPowerUpUsed)
-        {
-            keyState.rPowerUpUsed = true;
-            freezeAndChangeDir();
-        }
     }
 }
 
