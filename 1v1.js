@@ -39,12 +39,12 @@ function update()
         context.fillStyle = "red";
     else
         context.fillStyle = "white";
-    if (ball.serve)
+    if (ball.serve && !keyState.powerUpInUse)
     {
         ball.x += ball.xVel * serveSpeedMultiple;
         ball.y += ball.yVel * serveSpeedMultiple;
     }
-    else
+    else if (!keyState.powerUpInUse)
     {
         ball.x += ball.xVel;
         ball.y += ball.yVel;
@@ -90,20 +90,4 @@ function update()
     context.font = "45px sans-serif";
     context.fillText(Lplayer.score, board.width/5, 45);
     context.fillText(Rplayer.score, board.width/5 * 4 -45, 45);
-}
-
-function freezeAndChangeDir()
-{
-    let xVeltmp = ball.xVel;
-    let yVeltmp = ball.yVel;
-
-    ball.xVel = 0;
-    ball.yVel = 0;
-    keyState.powerUpInUse = true;
-
-    setTimeout(() => {
-        ball.xVel = xVeltmp;
-        ball.yVel = yVeltmp * -1;
-        keyState.powerUpInUse = false;
-    }, 750);
 }

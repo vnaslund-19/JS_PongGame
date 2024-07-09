@@ -1,5 +1,6 @@
 let predictedY;
 let AImargin;
+let powerUpPos;
 
 window.onload = function()
 {
@@ -41,13 +42,17 @@ function update()
     context.fillRect(Rplayer.x, Rplayer.y, Rplayer.width, Rplayer.height);
 
     // ball
-    context.fillStyle = "white";
-    if (ball.serve)
+    if (keyState.powerUpInUse)
+        context.fillStyle = "red";
+    else
+        context.fillStyle = "white";
+
+    if (ball.serve && !keyState.powerUpInUse)
     {
         ball.x += ball.xVel * serveSpeedMultiple;
         ball.y += ball.yVel * serveSpeedMultiple;
     }
-    else
+    else if (!keyState.powerUpInUse)
     {
         ball.x += ball.xVel;
         ball.y += ball.yVel;
@@ -87,13 +92,14 @@ function update()
             resetGame(1);
         }
 
-    context.font = "45px sans-serif";
-    context.fillText(Lplayer.score, board.width/5, 45);
-    context.fillText(Rplayer.score, board.width/5 * 4 -45, 45);
-
     // Draw middle line
     for (let i = 10; i < board.height; i+=25)
         context.fillRect(board.width/2 - 10, i, 5, 5);
+
+    context.fillStyle = "white";
+    context.font = "45px sans-serif";
+    context.fillText(Lplayer.score, board.width/5, 45);
+    context.fillText(Rplayer.score, board.width/5 * 4 -45, 45);
 }
 
 function predictFinalYPos(ball)
@@ -103,9 +109,18 @@ function predictFinalYPos(ball)
     // to avoid constant recalculation of a random value and thus the AI jittering
     // Randomness (AImargin) makes the AI hit at different angles
     // If you want it to sometimes miss, change the min value to negative
-    // For it to regularly miss, the multiple has to be 0.3 or below
+    // For it to regularly miss, the multiple has to be -0.3 or below
     // If getRandom returns -0.1 it only misses for very straight shots
     AImargin = playerHeight * getRandomBetween(-0.1, 0.45);
+
+    // As AI can only refresh its view every time predicFinalYPos is called the AI uses its PowerUp here
+    // ball.yVel > 3 as its only logical to use the powerUp when the ball is moving at a steep angle 
+    // ball.x checks are that so the power up is only used on opponents side but not too close to opponent
+    if (!keyState.rPowerUpUsed && ball.xVel < 0 && !ball.serve && ball.x < boardWidth/2 && ball.x > boardWidth/7 && ball.yVel > 3)
+    {
+        keyDownHandler({ code : "ArrowLeft" });
+        keyUpHandler({ code: "ArrowLeft" });
+    }
 
     if (ball.xVel < 0) // If ball is going away from AI
         return (boardHeight / 2 - ballSide / 2); // Prompt AI to go back to middle
@@ -136,6 +151,8 @@ function predictFinalYPos(ball)
         }
     }
     finalYPos += yMovement;
+    powerUpPos = getRandomBetween(boardWidth/6, boardWidth/2); // Randomly update what xPos the AI uses the powerUp in
+    console.log(ball.yVel);
     return (finalYPos);
 }
 

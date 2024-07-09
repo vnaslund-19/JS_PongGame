@@ -78,6 +78,9 @@ function fixOutOfBounds(player, yMax)
 
 function handlePaddleHit(ball, player)
 {
+    if (keyState.powerUpInUse) // To avoid glitch with multiple speed ups at once
+        return ;
+
     if ((ball.x < player.x + player.width) &&  // The ball's top left corner doesn't reach the paddle's top right corner
         (ball.x + ball.width > player.x) &&    // The ball's top right corner passes the paddle's top left corner
         (ball.y < player.y + player.height) && // The ball's top left corner doesn't reach the paddle's bottom left corner
@@ -224,6 +227,17 @@ function keyUpHandler(event)
             freezeAndChangeDir();
         }
     }
+}
+
+function freezeAndChangeDir()
+{
+    keyState.powerUpInUse = true;
+
+    ball.yVel *= -1;
+    setTimeout(() => 
+    {
+        keyState.powerUpInUse = false;
+    }, 750);
 }
 
 function getRandomBetween(min, max) 
