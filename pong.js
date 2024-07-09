@@ -1,5 +1,4 @@
 // Board
-
 let board;
 let context;
 
@@ -18,7 +17,6 @@ let startRadAngle = getRandomBetween((-Math.PI/4), (Math.PI/4));
 let xStartVel = startSpeed * Math.cos(startRadAngle) * getRandomEitherOr(-1, 1);
 let yStartVel = startSpeed * Math.sin(startRadAngle);
 
-
 let ball = 
 {
     x : boardWidth / 2 - ballSide / 2,
@@ -36,7 +34,10 @@ let keyState =
     w: false,
     s: false,
     up: false,  // ArrowUp
-    down: false // ArrowDown
+    down: false, // ArrowDown
+    lPowerUpUsed : false,
+    rPowerUpUsed : false,
+    powerUpInUse : false
 };
 
 const playerHeight = 50;
@@ -124,6 +125,9 @@ function resetGame(direction)
         speed: startSpeed,
         serve: true
     }
+
+    keyState.lPowerUpUsed = false;
+    keyState.rPowerUpUsed = false;
 }
 
 function endGame(winner)
@@ -201,6 +205,24 @@ function keyUpHandler(event)
             Rplayer.speed = -playerSpeed;
         else
             Rplayer.speed = 0;
+    }
+
+    if (event.code == "KeyD")
+        {
+            if (ball.xVel > 0 && !keyState.lPowerUpUsed)
+            {
+                keyState.lPowerUpUsed = true;
+                freezeAndChangeDir();
+            }
+        }
+        
+    if (event.code == "ArrowLeft")
+    {
+        if (ball.xVel < 0 && !keyState.rPowerUpUsed)
+        {
+            keyState.rPowerUpUsed = true;
+            freezeAndChangeDir();
+        }
     }
 }
 
