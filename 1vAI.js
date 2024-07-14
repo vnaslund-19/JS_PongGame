@@ -18,7 +18,7 @@ window.onload = function()
     document.addEventListener("keyup", keyUpHandler);
 
     setInterval(function() 
-    { predictedY = predictFinalYPos(ball);}, msAIcalcRefresh);
+    { predictedY = predictFinalYPos();}, msAIcalcRefresh);
 }
 
 function update()
@@ -58,9 +58,13 @@ function update()
     }
     context.fillRect(ball.x, ball.y, ball.width, ball.height);
 
-    handlePaddleHit(ball, Lplayer);
-    if (handlePaddleHit(ball, Rplayer))
-        ball.xVel *= -1;
+    if (ball.xVel < 0)
+        handlePaddleHit(ball, Lplayer)
+    else
+    {
+        if (handlePaddleHit(ball, Rplayer))
+            ball.xVel *= -1;
+    }
 
     // Bounce of top & bottom
     if (ball.y <= 0 || (ball.y + ball.height >= board.height))
@@ -70,26 +74,26 @@ function update()
 
     // Point scored, player who conceded serves
     if (ball.x < 0)
+    {
+        Rplayer.score++;
+        if (Rplayer.score >= 5) 
         {
-            Rplayer.score++;
-            if (Rplayer.score >= 5) 
-            {
-                endGame('AI wins!');
-                return;
-            }
-            resetGame(-1);
+            endGame('AI wins!');
+            return;
         }
+        resetGame(-1);
+    }
     
-        if (ball.x + ball.width > board.width)
+    if (ball.x + ball.width > board.width)
+    {
+        Lplayer.score++;
+        if (Lplayer.score >= 5)
         {
-            Lplayer.score++;
-            if (Lplayer.score >= 5)
-            {
-                endGame('You win!');
-                return;
-            }
-            resetGame(1);
+            endGame('You win!');
+            return;
         }
+        resetGame(1);
+    }
 
     // Draw middle line
     for (let i = 10; i < board.height; i+=25)
@@ -101,7 +105,7 @@ function update()
     context.fillText(Rplayer.score, board.width/5 * 4 -45, 45);
 }
 
-function predictFinalYPos(ball)
+function predictFinalYPos()
 {
     // AImargin is used in simulateAIinput
     // The calculation is put into this function 
@@ -115,38 +119,39 @@ function predictFinalYPos(ball)
     // As AI can only refresh its view every time predicFinalYPos is called the AI uses its PowerUp here
     // ball.yVel > 3 as its only logical to use the powerUp when the ball is moving at a steep angle 
     // ball.x checks are that so the power up is only used on opponents side but not too close to opponent
-    if (!keyState.rPowerUpUsed && ball.xVel < 0 && !ball.serve && ball.x < boardWidth/2 && ball.x > boardWidth/7 && ball.yVel > 3)
+    if (!keyState.rPowerUpUsed && ball.xVel < 0 && !ball.serve && ball.x < boardWidth/2 && ball.x > boardWidth/7 && Math.abs(ball.yVel) > 3)
         keyDownHandler({ code : "ArrowLeft" });
 
     if (ball.xVel < 0) // If ball is going away from AI
-        return (boardHeight / 2 - ballSide / 2); // Prompt AI to go back to middle
+        return (boardHeight / 2 - playerHeight / 2); // Prompt AI to go back to middle
 
     // Amount of times the screen refreshes before ball reaches other side: Length / xVel
     let refreshes = (boardWidth - xMargin - playerWidth - ball.x) / ball.xVel;
-    let yMovement = (ball.yVel * refreshes) % (boardHeight*2);
+    let yMovement = (ball.yVel * refreshes);
     
-    let distanceToBottom = boardHeight - ball.y;
-    let distanceToTop = ball.y;
-    let finalYPos = ball.y;
+    let finalYPos = ball.y + ballSide / 2;
 
-    for (let i = 0; i < 2; i++) 
+    while (true) 
     {
-        // Bounce off top
-        if (yMovement < 0 && yMovement < -distanceToTop)
+        if (yMovement < 0 && finalYPos + yMovement < ballSide/2) // Bounce off top
         {
-            yMovement += distanceToTop;
-            yMovement *= -1; 
-            finalYPos = 0;
-        }
-        // Bounce off bottom
-        else if (yMovement > 0 && yMovement > distanceToBottom)
-        {
-            yMovement -= distanceToBottom;
+            yMovement += finalYPos - ballSide/2;
             yMovement *= -1;
-            finalYPos = boardHeight;
+            finalYPos = ballSide/2;
+        } 
+        else if (yMovement > 0 && finalYPos + yMovement > boardHeight - ballSide/2) // Bounce off bottom
+        {
+            yMovement -= (boardHeight - finalYPos - ballSide/2);
+            yMovement *= -1;
+            finalYPos = boardHeight - ballSide/2;
+        } 
+        else 
+        {
+            finalYPos += yMovement;
+            break;
         }
     }
-    finalYPos += yMovement;
+    console.log("Predicted Y: " + finalYPos + "  (" + ball.xVel + ")");
     return (finalYPos);
 }
 
